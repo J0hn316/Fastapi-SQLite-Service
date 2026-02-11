@@ -28,3 +28,6 @@ class Note(Base):
         onupdate=func.now(),
         nullable=False,
     )
+
+
+from app.audit.models import AuditEvent  # noqa: F401
