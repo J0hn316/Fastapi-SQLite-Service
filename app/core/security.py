@@ -1,18 +1,21 @@
 from __future__ import annotations
 
-from fastapi import Header, HTTPException, status
+from fastapi import Header, HTTPException, Security, status
+from fastapi.security import APIKeyHeader
 
 from app.core.config import settings
 
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
-def require_api_key(x_api_key: str | None = Header(default=None)) -> str:
+
+def require_api_key(api_key: str | None = Security(api_key_header)) -> str:
     """
-    Simple API key auth.
-    Client must send: X-API-Key: <key>
-    Returns the actor string.
+    API key auth using X-API-Key header.
+    Shows an Authorize button in Swagger UI.
+    Returns an actor string for audit logs.
     """
 
-    if not x_api_key or x_api_key != settings.api_key:
+    if not api_key or api_key != settings.api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing API key",
